@@ -32,7 +32,7 @@ pinit(void)
 // state required to run in the kernel.
 // Otherwise return 0.
 static struct proc*
-allocproc(void)
+allocproc(int stride)
 {
   struct proc *p;
   char *sp;
@@ -47,6 +47,8 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
+  p->passo = stride;
+  p->passada = 0;
   release(&ptable.lock);
 
   // Allocate kernel stack.
@@ -81,7 +83,7 @@ userinit(void)
   struct proc *p;
   extern char _binary_initcode_start[], _binary_initcode_size[];
   
-  p = allocproc();
+  p = allocproc(N_TICKETS);
   initproc = p;
   if((p->pgdir = setupkvm()) == 0)
     panic("userinit: out of memory?");
@@ -126,13 +128,13 @@ growproc(int n)
 // Sets up stack to return as if from system call.
 // Caller must set state of returned proc to RUNNABLE.
 int
-fork(void)
+fork(int passo, char epasso)
 {
   int i, pid;
   struct proc *np;
 
   // Allocate process.
-  if((np = allocproc()) == 0)
+  if((np = allocproc( epasso ? passo : N_TICKETS)) == 0)
     return -1;
 
   // Copy process state from p.
@@ -265,34 +267,44 @@ wait(void)
 void
 scheduler(void)
 {
-  struct proc *p;
+  struct proc *p, *min;
+  int max;
 
   for(;;){
     // Enable interrupts on this processor.
     sti();
 
     // Loop over process table looking for process to run.
+
     acquire(&ptable.lock);
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    for(p = ptable.proc, max = MAX_STRIDE, min = 0; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
         continue;
+	  if(p->passada < max){
+		max = p->passada;
+		min = p;  
+	  }
+	}
 
-      // Switch to chosen process.  It is the process's job
-      // to release ptable.lock and then reacquire it
-      // before jumping back to us.
-      proc = p;
-      switchuvm(p);
-      p->state = RUNNING;
-      swtch(&cpu->scheduler, proc->context);
-      switchkvm();
+	if(!min)
+		goto loop1;
+	min->passada = STRIDE(min->passo);
+	// Switch to chosen process.  It is the process's job
+	// to release ptable.lock and then reacquire it
+	// before jumping back to us.
+	proc = min;
+	switchuvm(min);
+	min->state = RUNNING;
+	swtch(&cpu->scheduler, proc->context);
+	switchkvm();
 
-      // Process is done running for now.
-      // It should have changed its p->state before coming back.
-      proc = 0;
-    }
+	// Process is done running for now.
+	// It should have changed its p->state before coming back.
+	proc = 0;
+	loop1:
     release(&ptable.lock);
-
-  }
+    }
+    
 }
 
 // Enter scheduler.  Must hold only ptable.lock

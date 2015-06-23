@@ -12,3 +12,9 @@
 #define NBUF         (MAXOPBLOCKS*3)  // size of disk block cache
 #define FSSIZE       1000  // size of file system in blocks
 
+#define MAX_STRIDE   50000	
+#define	N_TICKETS	 250	//numero default de tickets
+#define MIN_TICKETS  25 	//quantidade mínima de tickets
+#define MAX_TICKETS  1000 	//quantidade máximo de tickets
+#define STRIDE( X ) ( MAX_TICKETS / (X) )	//macro para calcular passo
+
