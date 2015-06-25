@@ -288,7 +288,7 @@ scheduler(void)
 
 	if(!min)
 		goto loop1;
-	min->passada = STRIDE(min->passo);
+	min->passada += STRIDE(min->passo);
 	// Switch to chosen process.  It is the process's job
 	// to release ptable.lock and then reacquire it
 	// before jumping back to us.
