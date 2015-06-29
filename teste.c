@@ -14,14 +14,11 @@ int stoi(char * str_num)
 {
         int k = 0;
         char * ptr = str_num;
-        while(*ptr)
-                ptr++;
-        ptr--;
-        do   {
+        while(*ptr)	{
                 k *= 10;
                 k += str_num-'0';
-                ptr--;
-        } while(ptr != str_num);
+                ptr++;
+        }
         return k;
 }
 
