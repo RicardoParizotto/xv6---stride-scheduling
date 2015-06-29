@@ -16,7 +16,7 @@ int stoi(char * str_num)
         char * ptr = str_num;
         while(*ptr)	{
                 k *= 10;
-                k += str_num-'0';
+                k += *ptr-'0';
                 ptr++;
         }
         return k;
