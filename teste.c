@@ -9,6 +9,7 @@
 #include "stat.h"
 #include "user.h"
 #include "fcntl.h"
+#include "param.h"
 
 int stoi(char * str_num)
 {
@@ -16,36 +17,46 @@ int stoi(char * str_num)
         char * ptr = str_num;
         while(*ptr)	{
                 k *= 10;
-                k += *ptr-'0';
+				k += *ptr-'0';
                 ptr++;
         }
         return k;
 }
 
+void test(int T, int i, char * name){
+		int j, k;
+		for(j = 0; j < 100; j++){
+				for(k = 0; k < T; k++);
+				printf(1, "%s - %d tickets\n", name, i); 
+		}
+		exit();
+}
+
 int main(int argc, char **argv)
 {
-  int PID, i,k,l,j, T;
- 
-        PID = fork(500,1);
+  int PID, T;
+
+        PID = fork(100,1);
        
         T = stoi(argv[1]);
  
-        if(PID == 0)    {
-                for(i = 0; i < 100; i++)        {
-                        for(k = 0; k < T; k++);
-                        printf(1,"Filho %d\n",i);
-                }
-                exit();
-        }
-        else if(PID > 0)        {
-                for(j = 0; j < 100; j++)        {
-                        for(l = 0; l < T; l++);
-                        printf(1,"Pai %d\n",j);
-                }
-                exit();
-        }
-        else
-                printf(1,"Erro\n");
- 
+        if(PID == 0) {
+				test(T, 100, "filho");               
+		}else if(PID > 0)        {
+				PID = fork(500, 1);
+				if(PID == 0)	{
+						test(T, 500, "filho");
+				}else if(PID > 0)	{
+						PID = fork(1000, 1);
+						if(PID == 0){
+									test(T, 1000, "filho");
+						}else if(PID > 0){
+								test(T, N_TICKETS, "pai");
+				
+						}
+        
+				}
+		}
+		
         return 0;
 }
