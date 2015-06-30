@@ -37,22 +37,18 @@ int main(int argc, char **argv)
   int PID, T;
        T = stoi(argv[1]);
 
-       PID = fork(100,1);
+       PID = fork(1000,1);
         if(PID == 0) {
-				test(T, 100, "filho");   
+				test(T, 1000, "filho");   
 		}else if(PID > 0)        {
 				PID = fork(500, 1);
 				if(PID == 0)	{
 						test(T, 500, "filho");
 				}else if(PID > 0)	{
-						PID = fork(1000, 1);
+						PID = fork(100, 1);
 						if(PID == 0){
-									test(T, 1000, "filho");
-						}else if(PID > 0){
-								test(T, N_TICKETS, "pai");
-				
-						}
-        
+									test(T, 100, "filho");
+						}        
 				}
 		}
 		
