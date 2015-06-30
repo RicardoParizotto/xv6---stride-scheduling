@@ -134,7 +134,7 @@ fork(int passo, char epasso)
   struct proc *np;
 
   // Allocate process.
-  if((np = allocproc( epasso ? passo : N_TICKETS)) == 0)
+  if((np = allocproc( (epasso && passo >=  MIN_TICKETS && passo <= MAX_TICKETS) ? passo : N_TICKETS)) == 0)
     return -1;
 
   // Copy process state from p.

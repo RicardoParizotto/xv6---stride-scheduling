@@ -24,23 +24,23 @@ int stoi(char * str_num)
 
 int main(int argc, char **argv)
 {
-        int PID, i,k,l,j,T;
+  int PID, i,k,l,j, T;
  
-        PID = fork(1000,1);
+        PID = fork(500,1);
        
         T = stoi(argv[1]);
  
         if(PID == 0)    {
                 for(i = 0; i < 100; i++)        {
                         for(k = 0; k < T; k++);
-                        printf(1,"Filho %d - %d\n",i,k);
+                        printf(1,"Filho %d\n",i);
                 }
                 exit();
         }
         else if(PID > 0)        {
                 for(j = 0; j < 100; j++)        {
                         for(l = 0; l < T; l++);
-                        printf(1,"Pai %d - %d\n",j,l);
+                        printf(1,"Pai %d\n",j);
                 }
                 exit();
         }
