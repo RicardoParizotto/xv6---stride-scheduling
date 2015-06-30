@@ -35,13 +35,11 @@ void test(int T, int i, char * name){
 int main(int argc, char **argv)
 {
   int PID, T;
+       T = stoi(argv[1]);
 
-        PID = fork(100,1);
-       
-        T = stoi(argv[1]);
- 
+       PID = fork(100,1);
         if(PID == 0) {
-				test(T, 100, "filho");               
+				test(T, 100, "filho");   
 		}else if(PID > 0)        {
 				PID = fork(500, 1);
 				if(PID == 0)	{

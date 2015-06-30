@@ -47,7 +47,7 @@ allocproc(int stride)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
-  p->passo = stride;
+  p->passo = STRIDE(stride);
   p->passada = 0;
   release(&ptable.lock);
 
@@ -286,24 +286,23 @@ scheduler(void)
 	  }
 	}
 
-	if(!min)
-		goto loop1;
-	min->passada += STRIDE(min->passo);
-	// Switch to chosen process.  It is the process's job
-	// to release ptable.lock and then reacquire it
-	// before jumping back to us.
-	proc = min;
-	switchuvm(min);
-	min->state = RUNNING;
-	swtch(&cpu->scheduler, proc->context);
-	switchkvm();
+	if(min){
+	  min->passada += STRIDE(min->passo);
+	  // Switch to chosen process.  It is the process's job
+	  // to release ptable.lock and then reacquire it
+	  // before jumping back to us.
+	  proc = min;
+	  switchuvm(min);
+	  min->state = RUNNING;
+	  swtch(&cpu->scheduler, proc->context);
+	  switchkvm();
 
-	// Process is done running for now.
-	// It should have changed its p->state before coming back.
-	proc = 0;
-	loop1:
-    release(&ptable.lock);
-    }
+	  // Process is done running for now.
+	  // It should have changed its p->state before coming back.
+	  proc = 0;
+	}
+  release(&ptable.lock);
+  }
     
 }
 
